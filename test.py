@@ -14,7 +14,8 @@ def data_crolling():
     newDart.get_corp_finance(newQuant.get_corp_code_list())
 
 def data_mining():
-    pass
+    newQuant.mining_finance()
+    
 if __name__ == "__main__":
     newDart = DART(bsns_year = "2023")
     newQuant = Quant() # declare

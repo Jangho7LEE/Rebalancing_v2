@@ -6,8 +6,10 @@ from MyDart.lib.api import API
 class DART(API):
     from MyDart.finance import corp_code
     from MyDart.finance import corp_finance
+    from MyDart.finance import corp_finance_all
     from MyDart.finance import save_corp_finance
     from MyDart.finance import get_corp_finance
+    
 
     def __init__(self, bsns_year, base_url=None) -> None:
         if not base_url:
@@ -22,10 +24,11 @@ class DART(API):
         with open(data_path, 'r') as f:
             return f.readline()
 
-    def save_corp_code(self):
-        data = self.corp_code()
-        self._save_file("/CORPCODE.zip",data)
-        self._unzip_file("/CORPCODE.zip")
+    def save_corp_code(self, reset = 0):
+        if reset == 1 or not os.path.exists(self.base_path + "/CORPCODE.xml"):
+            data = self.corp_code()
+            self._save_file("/CORPCODE.zip",data)
+            self._unzip_file("/CORPCODE.zip")
 
     
     def _unzip_file(self, zip_path):

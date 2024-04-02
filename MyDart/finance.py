@@ -20,11 +20,11 @@ def get_corp_finance(self,corp_code_list, reset = 0):
 
 def save_corp_finance(self,corp_code_list):
     '''
-    save_corp_finance는 주어진 list에 해당하는 corp code를 가지는 기업의 재무정보를
+    save_corp_finance는 주어진 list에 해당하는 corp code를 가지는 기업의 '연결' 모든 재무정보를
     base_path/finance에 저장한다.
     '''
     for code in corp_code_list:
-        data = self.corp_finance(corp_code=code, bsns_year=self.bsns_year, reprt_code="11011")
+        data = self.corp_finance_all(corp_code=code, bsns_year=self.bsns_year, reprt_code="11011", fs_div = 'CFS')
         if data['status'] == "000":
             self._save_file(path = f"/finance/{code}",data= data)
 
@@ -52,4 +52,18 @@ def corp_finance(self,corp_code, bsns_year, reprt_code):
               "reprt_code":reprt_code  
               }
     url_path = "/api/fnlttMultiAcnt.json"
+    return self.limit_request("GET", url_path, payload = params)
+
+def corp_finance_all(self,corp_code, bsns_year, reprt_code, fs_div):
+    '''
+    상장법인(유가증권, 코스닥) 및 주요 비상장법인(사업보고서 제출대상 & IFRS 적용)이 
+    제출한 정기보고서 내에 XBRL재무제표의 '모든계정과목'을 제공합니다.
+    '''
+    check_required_parameters([[corp_code,"corp_code"],[bsns_year,"bsns_year"],[reprt_code,"reprt_code"],[fs_div, "fs_div"]])
+    params = {"corp_code": corp_code,
+              "bsns_year": bsns_year,
+              "reprt_code":reprt_code,
+              "fs_div": fs_div  
+              }
+    url_path = "/api/fnlttSinglAcntAll.json"
     return self.limit_request("GET", url_path, payload = params)
