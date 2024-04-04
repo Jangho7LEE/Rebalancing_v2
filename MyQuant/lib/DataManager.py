@@ -4,9 +4,12 @@ import xml.etree.ElementTree as ET
 
 from MyQuant.lib.stock.stock import stock
 
+
+
 class DataManager(object):
-    def __init__(self,base_path) -> None:
+    def __init__(self,base_path, bsns_year) -> None:
         self.set_paths(base_path)
+        self.bsns_year = bsns_year
         self.stock_dic = {}
     
     
@@ -16,6 +19,8 @@ class DataManager(object):
         
         # set finance path
         self.finance_path = self.base_path + '/finance'
+        self.price_path = self.base_path + '/price'
+        self.stocknum_path = self.base_path + '/stocknum'
         if not os.path.isdir(base_path): os.makedirs(self.finance_path) 
         
     def openfile(self, data_path:str):
@@ -72,27 +77,10 @@ class DataManager(object):
             sl.append(self.stock_dic[s].corp_code)
         return sl
     
-    # 나중에 mining.py 로 옮기기
-    def mining_finance(self):
-        corp_code_in_finance = os.listdir(self.finance_path)
-        for corp_code in corp_code_in_finance:
-            corp_code_path = self.finance_path + f'/{corp_code}'
-            finance_dic = self.openfile(data_path=corp_code_path)
-            self.stock_dic[corp_code].financestate = set_financestate(financial_list = finance_dic['list'])
-
-
-def set_financestate(financial_list):
-    newDic = {'status': 1}
-    bs_year = int(financial_list[0]['bsns_year'])
-    for account in financial_list:
-        newDic[account['account_id']] = {}
-        if 'thstrm_amount' in account and len(account['thstrm_amount'])>1:
-            newDic[account['account_id']][f'{bs_year}'] = float(account['thstrm_amount'].replace('.',''))
-        if 'frmtrm_amount' in account and len(account['frmtrm_amount'])>1: 
-            newDic[account['account_id']][f'{bs_year-1}'] = float(account['frmtrm_amount'].replace('.',''))
-        if 'bfefrmtrm_amount' in account and len(account['bfefrmtrm_amount'])>1: 
-            newDic[account['account_id']][f'{bs_year-2}'] = float(account['bfefrmtrm_amount'].replace('.',''))
-
-    return newDic
     
+
+
+    
+
+        
         

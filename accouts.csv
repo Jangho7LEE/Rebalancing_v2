@@ -1,0 +1,141 @@
+재무상태표,유동자산,ifrs_CurrentAssets
+재무상태표,현금및현금성자산,ifrs_CashAndCashEquivalents
+재무상태표,단기금융상품,dart_ShortTermDepositsNotClassifiedAsCashEquivalents
+재무상태표,매출채권,dart_ShortTermTradeReceivable
+재무상태표,미수금,dart_ShortTermOtherReceivables
+재무상태표,선급금,-표준계정코드 미사용-
+재무상태표,선급비용,-표준계정코드 미사용-
+재무상태표,재고자산,ifrs_Inventories
+재무상태표,기타유동자산,dart_OtherCurrentAssets
+재무상태표,매각예정분류자산,ifrs_NoncurrentAssetsOrDisposalGroupsClassifiedAsHeldForSaleOrAsHeldForDistributionToOwners
+재무상태표,비유동자산,ifrs_NoncurrentAssets
+재무상태표,장기매도가능금융자산,dart_LongTermDepositsNotClassifiedAsCashEquivalents
+재무상태표,기타포괄손익-공정가치금융자산,-표준계정코드 미사용-
+재무상태표,당기손익-공정가치금융자산,-표준계정코드 미사용-
+재무상태표,종속기업, 관계기업 및 공동기업 투자,ifrs_InvestmentsInSubsidiariesJointVenturesAndAssociates
+재무상태표,유형자산,ifrs_PropertyPlantAndEquipment
+재무상태표,무형자산,ifrs_InvestmentProperty
+재무상태표,장기선급비용,dart_LongTermPrepaidExpenses
+재무상태표,순확정급여자산,dart_DepositsForSeveranceInsurance
+재무상태표,이연법인세자산,ifrs_DeferredTaxAssets
+재무상태표,기타비유동자산,dart_OtherNonCurrentAssets
+재무상태표,자산총계,ifrs_Assets
+재무상태표,유동부채,ifrs_CurrentLiabilities
+재무상태표,매입채무,-표준계정코드 미사용-
+재무상태표,단기차입금,ifrs_ShorttermBorrowings
+재무상태표,미지급금,-표준계정코드 미사용-
+재무상태표,선수금,-표준계정코드 미사용-
+재무상태표,예수금,-표준계정코드 미사용-
+재무상태표,미지급비용,-표준계정코드 미사용-
+재무상태표,미지급법인세,dart_PaymentsOfIncomeTaxesPayable
+재무상태표,유동성장기부채,-표준계정코드 미사용-
+재무상태표,충당부채,ifrs_CurrentProvisions
+재무상태표,기타유동부채,dart_OtherCurrentLiabilities
+재무상태표,비유동부채,ifrs_NoncurrentLiabilities
+재무상태표,사채,dart_BondsIssued
+재무상태표,장기미지급금,dart_LongTermOtherPayablesGross
+재무상태표,장기충당부채,dart_LongTermTradeAndOtherNonCurrentPayables
+재무상태표,기타비유동부채,dart_OtherNonCurrentLiabilities
+재무상태표,부채총계,ifrs_Liabilities
+재무상태표,자본금,ifrs_IssuedCapital
+재무상태표,우선주자본금,dart_IssuedCapitalOfPreferredStock
+재무상태표,보통주자본금,dart_IssuedCapitalOfCommonStock
+재무상태표,주식발행초과금,ifrs_SharePremium
+재무상태표,이익잉여금,ifrs_RetainedEarnings
+재무상태표,기타자본항목,dart_ElementsOfOtherStockholdersEquity
+재무상태표,자본총계,ifrs_Equity
+재무상태표,자본과부채총계,ifrs_EquityAndLiabilities
+손익계산서,수익(매출액),ifrs_Revenue
+손익계산서,매출원가,ifrs_CostOfSales
+손익계산서,매출총이익,ifrs_GrossProfit
+손익계산서,판매비와관리비,dart_TotalSellingGeneralAdministrativeExpenses
+손익계산서,영업이익(손실),dart_OperatingIncomeLoss
+손익계산서,기타수익,dart_OtherGains
+손익계산서,기타비용,dart_OtherLosses
+손익계산서,금융수익,ifrs_FinanceIncome
+손익계산서,금융비용,-표준계정코드 미사용-
+손익계산서,법인세비용차감전순이익(손실),ifrs_ProfitLossBeforeTax
+손익계산서,법인세비용,ifrs_IncomeTaxExpenseContinuingOperations
+손익계산서,계속영업이익(손실),ifrs_ProfitLossFromContinuingOperations
+손익계산서,당기순이익(손실),ifrs_ProfitLoss
+손익계산서,기본주당이익(손실),ifrs_BasicEarningsLossPerShare
+손익계산서,희석주당이익(손실),ifrs_DilutedEarningsLossPerShare
+포괄손익계산서,당기순이익(손실),ifrs_ProfitLoss
+포괄손익계산서,기타포괄손익,ifrs_OtherComprehensiveIncome
+포괄손익계산서,후속적으로 당기손익으로 재분류되지 않는 포괄손익,dart_OtherComprehensiveIncomeThatWillNotBeReclassifiedToProfitOrLossNetOfTax
+포괄손익계산서,기타포괄손익-공정가치금융자산평가손익,-표준계정코드 미사용-
+포괄손익계산서,순확정급여자산 재측정요소,-표준계정코드 미사용-
+포괄손익계산서,후속적으로 당기손익으로 재분류되는 포괄손익,dart_OtherComprehensiveIncomeThatWillBeReclassifiedToProfitOrLossNetOfTax
+포괄손익계산서,매도가능금융자산평가손익,ifrs_GainsLossesOnRemeasuringAvailableforsaleFinancialAssetsNetOfTax
+포괄손익계산서,총포괄손익,ifrs_ComprehensiveIncome
+현금흐름표,영업활동 현금흐름,ifrs_CashFlowsFromUsedInOperatingActivities
+현금흐름표,영업에서 창출된 현금흐름,dart_ProfitLossForStatementOfCashFlows
+현금흐름표,당기순이익,-표준계정코드 미사용-
+현금흐름표,조정,-표준계정코드 미사용-
+현금흐름표,영업활동으로 인한 자산부채의 변동,-표준계정코드 미사용-
+현금흐름표,이자의 수취,ifrs_InterestReceivedClassifiedAsOperatingActivities
+현금흐름표,이자의 지급,ifrs_InterestPaidClassifiedAsOperatingActivities
+현금흐름표,배당금 수입,ifrs_DividendsPaidClassifiedAsOperatingActivities
+현금흐름표,법인세 납부액,ifrs_IncomeTaxesPaidRefundClassifiedAsOperatingActivities
+현금흐름표,투자활동 현금흐름,ifrs_CashFlowsFromUsedInInvestingActivities
+현금흐름표,단기금융상품의 순감소(증가),-표준계정코드 미사용-
+현금흐름표,단기매도가능금융자산의 처분,dart_ProceedsFromSalesOfAvailableForSaleFinancialAssets
+현금흐름표,장기금융상품의 처분,dart_ProceedsFromSalesOfLongTermFinancialInstruments
+현금흐름표,장기금융상품의 취득,dart_PurchaseOfLongTermFinancialInstruments
+현금흐름표,장기매도가능금융자산의 처분,dart_ProceedsFromSalesOfNonCurrentAvailableForSaleFinancialAssets
+현금흐름표,장기매도가능금융자산의 취득,dart_PurchaseOfNonCurrentAvailableForSaleFinancialAssets
+현금흐름표,기타포괄손익-공정가치금융자산의 처분,-표준계정코드 미사용-
+현금흐름표,기타포괄손익-공정가치금융자산의 취득,-표준계정코드 미사용-
+현금흐름표,당기손익-공정가치금융자산의 처분,-표준계정코드 미사용-
+현금흐름표,당기손익-공정가치금융자산의 취득,-표준계정코드 미사용-
+현금흐름표,종속기업, 관계기업 및 공동기업 투자의 처분,-표준계정코드 미사용-
+현금흐름표,종속기업, 관계기업 및 공동기업 투자의 취득,-표준계정코드 미사용-
+현금흐름표,유형자산의 처분,ifrs_ProceedsFromSalesOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities
+현금흐름표,유형자산의 취득,ifrs_PurchaseOfPropertyPlantAndEquipmentClassifiedAsInvestingActivities
+현금흐름표,무형자산의 처분,ifrs_ProceedsFromSalesOfIntangibleAssetsClassifiedAsInvestingActivities
+현금흐름표,무형자산의 취득,ifrs_PurchaseOfIntangibleAssetsClassifiedAsInvestingActivities
+현금흐름표,현금의 기타유출입,-표준계정코드 미사용-
+현금흐름표,재무활동 현금흐름,ifrs_CashFlowsFromUsedInFinancingActivities
+현금흐름표,단기차입금의 순증가(감소),-표준계정코드 미사용-
+현금흐름표,자기주식의 취득,dart_AcquisitionOfTreasuryShares
+현금흐름표,사채 및 장기차입금의 상환,dart_RepaymentsOfBonds
+현금흐름표,배당금 지급,ifrs_DividendsPaidClassifiedAsFinancingActivities
+현금흐름표,외화환산으로 인한 현금의 변동,ifrs_EffectOfExchangeRateChangesOnCashAndCashEquivalents
+현금흐름표,현금 및 현금성자산의 증가(감소),ifrs_IncreaseDecreaseInCashAndCashEquivalents
+현금흐름표,기초 현금 및 현금성자산,dart_CashAndCashEquivalentsAtBeginningOfPeriodCf
+현금흐름표,기말 현금 및 현금성자산,dart_CashAndCashEquivalentsAtEndOfPeriodCf
+자본변동표,기초자본,dart_EquityAtBeginningOfPeriod
+자본변동표,기초자본,dart_EquityAtBeginningOfPeriod
+자본변동표,기초자본,dart_EquityAtBeginningOfPeriod
+자본변동표,기초자본,dart_EquityAtBeginningOfPeriod
+자본변동표,기초자본,dart_EquityAtBeginningOfPeriod
+자본변동표,기초자본,dart_EquityAtBeginningOfPeriod
+자본변동표,회계정책변경누적효과,ifrs_IncreaseDecreaseThroughChangesInAccountingPolicies
+자본변동표,회계정책변경누적효과,ifrs_IncreaseDecreaseThroughChangesInAccountingPolicies
+자본변동표,수정후 기초자본,-표준계정코드 미사용-
+자본변동표,수정후 기초자본,-표준계정코드 미사용-
+자본변동표,수정후 기초자본,-표준계정코드 미사용-
+자본변동표,수정후 기초자본,-표준계정코드 미사용-
+자본변동표,수정후 기초자본,-표준계정코드 미사용-
+자본변동표,수정후 기초자본,-표준계정코드 미사용-
+자본변동표,당기순이익(손실),-표준계정코드 미사용-
+자본변동표,당기순이익(손실),-표준계정코드 미사용-
+자본변동표,매도가능금융자산평가손익,-표준계정코드 미사용-
+자본변동표,매도가능금융자산평가손익,-표준계정코드 미사용-
+자본변동표,매도가능금융자산평가손익,-표준계정코드 미사용-
+자본변동표,기타포괄손익-공정가치금융자산평가손익,-표준계정코드 미사용-
+자본변동표,기타포괄손익-공정가치금융자산평가손익,-표준계정코드 미사용-
+자본변동표,기타포괄손익-공정가치금융자산평가손익,-표준계정코드 미사용-
+자본변동표,순확정급여자산 재측정요소,-표준계정코드 미사용-
+자본변동표,순확정급여자산 재측정요소,-표준계정코드 미사용-
+자본변동표,배당,-표준계정코드 미사용-
+자본변동표,배당,-표준계정코드 미사용-
+자본변동표,자기주식의 취득,-표준계정코드 미사용-
+자본변동표,자기주식의 취득,-표준계정코드 미사용-
+자본변동표,자기주식의 소각,-표준계정코드 미사용-
+자본변동표,자기주식의 소각,-표준계정코드 미사용-
+자본변동표,기말자본,ifrs_Equity
+자본변동표,기말자본,ifrs_Equity
+자본변동표,기말자본,ifrs_Equity
+자본변동표,기말자본,ifrs_Equity
+자본변동표,기말자본,ifrs_Equity

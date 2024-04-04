@@ -3,13 +3,13 @@ import os
 from MyQuant.lib.stock.stock import stock
 
 
-def set_stock_dic(self):
+def set_stock_dic(self, reset = 0):
     '''
     set_stock_dic은 저장된 stock_dic json file을 불러와 stock_dic에 저장하거나
     CORPCODE.xml을 통해 불러온다 
     '''
     data_path = self.base_path + "/stock_dic"
-    if os.path.exists(data_path):
+    if os.path.exists(data_path) and reset == 0:
         self.load_stock_dic(data_path = data_path)
     else:
         self.corp_code_to_stock()

@@ -9,6 +9,11 @@ class DART(API):
     from MyDart.finance import corp_finance_all
     from MyDart.finance import save_corp_finance
     from MyDart.finance import get_corp_finance
+    from MyDart.finance import get_corp_price
+    from MyDart.finance import save_corp_price
+    from MyDart.finance import get_corp_stocknum
+    from MyDart.finance import save_corp_stock_num
+    from MyDart.finance import corp_stock_quantity
     
 
     def __init__(self, bsns_year, base_url=None) -> None:

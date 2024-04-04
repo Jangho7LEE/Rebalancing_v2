@@ -1,3 +1,4 @@
+import pandas as pd
 class stock(object):
     def __init__(self,**kwargs):
         if "corp_code" in kwargs: self.corp_code  = kwargs['corp_code'] # str
@@ -5,7 +6,9 @@ class stock(object):
         if "stock_code" in kwargs: self.stock_code  = kwargs['stock_code'] # str
         if "modify_date" in kwargs: self.modify_date  = kwargs['modify_date']  # str
         if "financestate" in kwargs: self.financestate  = kwargs['financestate'] # dic
-        self.financestate = {'status': 0} # status 1: 존재한다
+        else: self.financestate = {'status': 0} # status 1: 존재한다
+        if "valuestate" in kwargs: self.valuestate  = kwargs['valuestate'] # dic
+        else: self.valuestate = {'status': 0} # status 1: 존재한다
     def export_dic(self):
         """
         |

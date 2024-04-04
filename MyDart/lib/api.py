@@ -2,7 +2,7 @@ import json
 from json import JSONDecodeError
 import requests
 import logging
-
+import time
 from MyDart.lib.utils import cleanNoneValue
 from MyDart.lib.utils import check_required_parameter
 from MyDart.lib.utils import encoded_string
@@ -34,6 +34,7 @@ class API(object):
         return self.send_request(http_method, url_path, payload=payload, download=True)
     
     def send_request(self, http_method, url_path, payload=None, special =False, download=False):
+        time.sleep(0.7)
         if payload is None:
             payload = {'crtfc_key' : self.key}
         else:
@@ -47,7 +48,11 @@ class API(object):
                 "params": self._prepare_params(payload, special),
             }
         )
-        response = self._dispatch_request(http_method)(**params)
+        try:
+            response = self._dispatch_request(http_method)(**params)
+        except:
+            data ={'status': '-1'}
+            return data
         logging.debug("raw response from server:" + response.text)
         self._handle_exception(response)
         if download:
