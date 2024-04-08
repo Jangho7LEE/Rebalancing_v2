@@ -85,7 +85,7 @@ def _set_values(stock,bsns_year):
     _set_values_PSR(stock, bsns_year)
     _set_values_EE(stock, bsns_year)
     _set_values_PCR(stock, bsns_year)
-    _set_values_div(stock, bsns_year)
+    _set_values_DIV(stock, bsns_year)
 
 
 def _get_market_cap(stock):
@@ -151,8 +151,8 @@ def _set_values_EE(stock,bsns_year):
     EBITDA = 법인세비용차감전순이익 (ifrs-full_ProfitLossBeforeTax) + 감가상각비 
     우선은 EBITDA를 법인세비용차감전순이익 (ifrs-full_ProfitLossBeforeTax) 으로 대체한다
     '''
-    required_account_list = ['ifrs_Liabilities',
-                             'ifrs_CashAndCashEquivalents',
+    required_account_list = ['ifrs-full_Liabilities',
+                             'ifrs-full_CashAndCashEquivalents',
                              'ifrs-full_ProfitLossBeforeTax',
                              ]
     if _check_account(stock,required_account_list,bsns_year):
@@ -172,7 +172,7 @@ def _set_values_PCR(stock,bsns_year):
         stock.valuestate['PCR'] = {'value' : PCR}
     else: stock.valuestate['status'] = 0
 
-def _set_values_div(stock,bsns_year):
+def _set_values_DIV(stock,bsns_year):
     '''
     배당수익률 = 주당 배당금 / 주가 = 배당금 (ifrs-full_DividendsPaidClassifiedAsFinancingActivities) / 시가총액
     '''

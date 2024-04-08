@@ -17,7 +17,12 @@ def data_mining():
     newQuant.mining_stocknum()
     newQuant.mining_price()
     newQuant.curving_finance()
+    newQuant.set_score()
+
+def qaunt():
+    newQuant.quant_stratgy()
     
+
 if __name__ == "__main__":
     bsns_year = "2023"
     newDart = DART(bsns_year = bsns_year)
@@ -30,6 +35,10 @@ if __name__ == "__main__":
     # data_crolling()
 
     # Data mining phase
-    data_mining()
+    # data_mining()
+
+    #get starage
+    qaunt()
+    
     
 

@@ -21,6 +21,7 @@ class stock(object):
             "stock_code": self.stock_code,
             "modify_date": self.modify_date,
             "financestate": self.financestate,
+            "valuestate": self.valuestate
         }
         return dic
 
