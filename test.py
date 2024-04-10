@@ -25,8 +25,8 @@ def qaunt():
 
 if __name__ == "__main__":
     bsns_year = "2023"
-    newDart = DART(bsns_year = bsns_year)
-    newQuant = Quant(bsns_year = bsns_year) # declare
+    newDart = DART(bsns_year = bsns_year, base_path = f"./data_{bsns_year}")
+    newQuant = Quant(bsns_year = bsns_year, base_path = f"./data_{bsns_year}") # declare
 
     # Qaunt init phase
     quant_init()

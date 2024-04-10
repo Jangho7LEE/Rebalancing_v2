@@ -16,16 +16,16 @@ class DART(API):
     from MyDart.finance import corp_stock_quantity
     
 
-    def __init__(self, bsns_year, base_url=None) -> None:
+    def __init__(self, bsns_year, base_url=None, base_path = "./data") -> None:
         if not base_url:
             base_url = 'https://opendart.fss.or.kr'
         key = self._load_key()
         self.bsns_year = bsns_year
-        self.base_path = "./data"
+        self.base_path = base_path
         super().__init__(key, base_url)
         
     def _load_key(self):
-        data_path = "./data/key.txt"
+        data_path = self.base_path + "/key.txt"
         with open(data_path, 'r') as f:
             return f.readline()
 

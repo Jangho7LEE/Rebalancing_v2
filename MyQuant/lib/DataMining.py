@@ -86,7 +86,8 @@ def _set_values(stock,bsns_year):
     _set_values_EE(stock, bsns_year)
     _set_values_PCR(stock, bsns_year)
     _set_values_DIV(stock, bsns_year)
-
+    _set_values_EPS_G(stock, bsns_year)
+    _set_values_ACCPS(stock, bsns_year)
 
 def _get_market_cap(stock):
     '''
@@ -98,6 +99,17 @@ def _get_market_cap(stock):
          return (stock.financestate['보통주'] + stock.financestate['우선주']) * stock.financestate['stockprice'] 
     else:
         return stock.financestate['보통주'] * stock.financestate['stockprice']
+
+def _get_avg_stocknum(stock):
+    '''
+    가중평균유통발행주식수
+    '''
+    if '우선주' in stock.financestate and 'preffered_stockprice' in stock.financestate:
+        return stock.financestate['보통주'] + stock.financestate['우선주']*stock.financestate['preffered_stockprice']/stock.financestate['stockprice'] 
+    elif '우선주' in stock.financestate:
+         return (stock.financestate['보통주'] + stock.financestate['우선주']) 
+    else:
+        return stock.financestate['보통주'] 
 
 def _check_account(stock, paramlist,bsns_year):
     check = 1
@@ -183,5 +195,59 @@ def _set_values_DIV(stock,bsns_year):
         stock.valuestate['DIV'] = {'value' : DIV}
     else:
         stock.valuestate['DIV'] = {'value' : 0}
-    
 
+def _set_values_EPS_G(stock,bsns_year):
+    '''
+    연 EPS 증가율 => 순이익 증가율로 대체 => 연간 순이익 (ifrs-full_ProfitLoss)[bsns_year] - 연간 순이익 (ifrs-full_ProfitLoss)[bsns_year-1]
+    '''
+    required_account_list = ['ifrs-full_ProfitLoss',
+                             ]
+    last_bsns_year = str(int(bsns_year)-1)
+    if _check_account(stock,required_account_list,bsns_year) and _check_account(stock,required_account_list,last_bsns_year) :
+        EPS_G  = (stock.financestate['ifrs-full_ProfitLoss'][bsns_year]) - (stock.financestate['ifrs-full_ProfitLoss'][last_bsns_year]) 
+        stock.valuestate['EPS_G'] = {'value' : EPS_G}
+    else: stock.valuestate['status'] = 0
+
+def _set_values_ACCPS(stock,bsns_year):
+    '''
+    ACCPS (주당발생액) = (순이익 (ifrs-full_ProfitLoss) - 영업활동으로 인한 현금흐름 (ifrs-full_CashFlowsFromUsedInOperatingActivities)) / 발행주식수
+    '''
+    required_account_list = ['ifrs-full_ProfitLoss',
+                             'ifrs-full_CashFlowsFromUsedInOperatingActivities'
+                             ]
+    if _check_account(stock,required_account_list,bsns_year):
+        ACCPS = (stock.financestate['ifrs-full_ProfitLoss'][bsns_year] - stock.financestate['ifrs-full_CashFlowsFromUsedInOperatingActivities'][bsns_year]) / _get_avg_stocknum(stock)
+        stock.valuestate['ACCPS'] = {'value' : ACCPS}
+    else: stock.valuestate['status'] = 0
+
+def _set_values_NOA_G(stock,bsns_year):
+    '''
+    순영업자산 (net operating asset) = 영업자산 - 영업부채
+      증가율
+    '''
+    pass
+
+def _set_values_DTE(stock,bsns_year):
+    '''
+    Debt to equity = 부채 총계 (ifrs-full_Liabilities) / 자본 총계 (ifrs-full_Equity)
+    '''
+    required_account_list = ['ifrs-full_Liabilities',
+                             'ifrs-full_Equity'
+                             ]
+    if _check_account(stock,required_account_list,bsns_year):
+        DTE = (stock.financestate['ifrs-full_ProfitLoss'][bsns_year] - stock.financestate['ifrs-full_CashFlowsFromUsedInOperatingActivities'][bsns_year]) / _get_avg_stocknum(stock)
+        stock.valuestate['DTE'] = {'value' : DTE}
+    else: stock.valuestate['status'] = 0
+
+def _set_values_PCD(stock,bsns_year): 
+    '''
+    percentage change in debt = (부채 총계[n-1] - 부채총계[n]) / 부채 총계[n-1]
+    '''
+    required_account_list = ['ifrs-full_Liabilities',
+                             ]
+    last_bsns_year = str(int(bsns_year)-1)
+    if _check_account(stock,required_account_list,bsns_year) and _check_account(stock,required_account_list,last_bsns_year) :
+        PCD  = (stock.financestate['ifrs-full_Liabilities'][last_bsns_year] - stock.financestate['ifrs-full_Liabilities'][bsns_year])/stock.financestate['ifrs-full_ProfitLoss'][last_bsns_year] 
+        stock.valuestate['PCD'] = {'value' : PCD}
+    else: stock.valuestate['status'] = 0
+    
