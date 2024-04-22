@@ -33,6 +33,36 @@ class DataManager(object):
         else:
             return self.openJson(data_path)
     
+    def saveFlag(self, flag: str, value = None):
+        flag_path = self.base_path + '/flags'
+        if os.path.exists(flag_path):
+            with open(flag_path, 'r') as f:
+                flag_dic = json.load(f)
+            if value:
+                flag_dic[flag] = value
+            else:
+                flag_dic[flag] = 'On'
+        else:
+            flag_dic = {}
+            if value:
+                flag_dic[flag] = value
+            else:
+                flag_dic[flag] = 'On'
+        with open(flag_path, 'w') as f:
+            json.dump(flag_dic, f)
+
+    def loadFlag(self, flag: str):
+        flag_path = self.base_path + '/flags'
+        if os.path.exists(flag_path):
+            with open(flag_path, 'r') as f:
+                flag_dic = json.load(f)
+            if flag in flag_dic:
+                return flag_dic[flag]
+            else:
+                return 'Off'
+        else:
+            return 'Off'
+
     def openXML(self, path):
         """
         openXML is for open XML and return ElementTree
@@ -45,7 +75,7 @@ class DataManager(object):
         '''
         with open(path, 'r') as f:
             return json.load(f)    
-
+    
     def save_stock_dic(self):
         """
         self.stock_dic 을 json dump형태로 base_path + "stockdic"형태로 저장 
@@ -78,7 +108,7 @@ class DataManager(object):
         return sl
     
     
-
+    
 
     
 

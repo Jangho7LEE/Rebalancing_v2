@@ -1,8 +1,7 @@
-rlist =['PBR', 'PER', 'PSR', 'EE', 'PCR','DIV']
-x = [64.77,59.81,74.53, 94.46,66.14,31.47]
-y = 61.59
-z = []
-for xx in x:
-    z.append((xx**2)/y**2)
-
-print(z)
+import os
+from MyBacktracker import Backtracker
+# print(len(os.listdir("./data/market/price")))
+myback = Backtracker()
+myback.set_market_data()
+# myback.corp_dic['00126380'] = '005930'
+# myback.get_market_data(corp_code='00126380')

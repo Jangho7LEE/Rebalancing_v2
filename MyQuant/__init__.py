@@ -3,12 +3,13 @@ from scipy.stats import percentileofscore
 import pandas as pd
 
 class Quant(DataManager):
-    def __init__(self, bsns_year, base_path = "./data") -> None:
+    def __init__(self, rebalancing_date, bsns_year, base_path = "./data") -> None:
         super().__init__(base_path, bsns_year)
         self.value_list_low_good = ['PBR', 'PER', 'PSR', 'EE', 'PCR',]
         self.value_list_high_good = ['DIV',]
         self.score_df = None
         self.stratgy_df = None
+        self.rebalancing_date = rebalancing_date
 
     '''
     | DataManager 기반 함수 

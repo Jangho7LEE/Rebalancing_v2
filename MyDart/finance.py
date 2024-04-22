@@ -1,5 +1,10 @@
+from MyBacktracker.lib import get_next_closest_price
+from MyBacktracker.lib import cal_momentum
 from MyDart.lib.utils import check_required_parameters
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 from lxml import html
+import pandas as pd
 import requests
 import os
 def get_corp_finance(self,stock_dic, reset = 0):
@@ -70,6 +75,8 @@ def corp_finance_all(self,corp_code, bsns_year, reprt_code, fs_div):
     url_path = "/api/fnlttSinglAcntAll.json"
     return self.limit_request("GET", url_path, payload = params)
 
+
+####################################################################################################
 def get_corp_stocknum(self,stock_dic, reset = 0):
     '''
     get_corp_finance는 list에 존재하는 주식발행량을 가져와 저장한다
@@ -107,6 +114,8 @@ def corp_stock_quantity(self,corp_code, bsns_year, reprt_code):
     url_path = "/api/stockTotqySttus.json"
     return self.limit_request("GET", url_path, payload = params)
 
+
+####################################################################################################
 def get_corp_price(self, stock_dic, reset = 0):
     '''
     get_corp_price list에 존재하는 기업의 네이버 주식 기준 가격상황을 들고온다.
@@ -126,84 +135,66 @@ def get_corp_price(self, stock_dic, reset = 0):
     pass
 
 def save_corp_price(self, corp_code_list, stock_dic):
-    for code in corp_code_list:
-        if '우선주' in stock_dic[code].financestate:
-            data = corp_price(stock_dic[code].stock_code)
-            prefered_corp_price(code = stock_dic[code].stock_code, data= data)
-        else:
-            data = corp_price(stock_dic[code].stock_code)
+    for corp_code in corp_code_list:
+        data = corp_price(market_path = self.market_price_path, corp_code = corp_code)
+        if data:
+            if '우선주' in stock_dic[corp_code].financestate:
+                prefered_corp_price(market_path = self.market_price_path, code = corp_code, data= data)
+            self._save_file(path = f"/price/{corp_code}",data= data)
         
-        if data: self._save_file(path = f"/price/{code}",data= data)
-        
-def prefered_corp_price(code,data):
-    '''
-    우선주의 주식가격 data에 추가한다
-    ['1M momentum', '3M momentum','6M momentum','1Y momentum','stockprice','preffered_stockprice]
-    '''
-    code = code[:-1] + '5'
-    url_kor =  f"https://navercomp.wisereport.co.kr/v2/company/c1010001.aspx?cmp_cd={code}"
-    headers1 = {
-        "Accept": "text/html, */*; q=0.01",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,ja;q=0.6,es;q=0.5",
-        "Connection": "keep-alive",
-        "Cookie": "setC1010001=%5B%7B%22conGubun%22%3A%22MAIN%22%2C%22cTB23%22%3A%22cns_td1%22%2C%22bandChartGubun%22%3A%22MAIN%22%2C%22finGubun%22%3A%22MAIN%22%2C%22cTB00%22%3A%22cns_td20%22%7D%5D; _gid=GA1.3.1069169000.1703492095; ASP.NET_SessionId=wos4nhn10aa0x5gt2liw0pao; _gat_gtag_UA_74989022_7=1; _ga=GA1.1.438763864.1702303131; _ga_KEHSJRBTJS=GS1.1.1703492094.4.1.1703493227.0.0.0",
-        "Host": "navercomp.wisereport.co.kr",
-        "Referer": f"https://navercomp.wisereport.co.kr/v2/company/c1010001.aspx?cmp_cd={code}",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "X-Requested-With": "XMLHttpRequest",
-        "sec-ch-ua": "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Google Chrome\";v=\"120\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\""
-        }       
-    htmltext = requests.get(url_kor, headers= headers1).text
-    if htmltext and '올바른 종목이 아닙니다' not in htmltext and '접속장애' not in htmltext:
-        tree = html.fromstring(htmltext) 
-        xpath_expression2 = "/html/body/div/form/div[1]/div/div[2]/div[3]/div/div/div[1]/div[1]/div[2]/table/tbody/tr[1]/td/strong"
-        price = tree.xpath(xpath_expression2 + "/text()")[0].replace("\t","").replace("\r","").replace("\n","").replace(",","")
-        data['preffered_stockprice'] = price
-    else:
-        data['preffered_stockprice'] = data['stockprice']
-def corp_price(code):
+def prefered_corp_price(market_path, code,data):
     '''
     corp_price는 stock code를 input으로 받아 다음 key를 가지는 dic 반환한다
     ['1M momentum', '3M momentum','6M momentum','1Y momentum','stockprice']
     input: stock code
     '''
-    url_kor =  f"https://navercomp.wisereport.co.kr/v2/company/c1010001.aspx?cmp_cd={code}"
-    headers1 = {
-        "Accept": "text/html, */*; q=0.01",
-        "Accept-Encoding": "gzip, deflate, br",
-        "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7,ja;q=0.6,es;q=0.5",
-        "Connection": "keep-alive",
-        "Cookie": "setC1010001=%5B%7B%22conGubun%22%3A%22MAIN%22%2C%22cTB23%22%3A%22cns_td1%22%2C%22bandChartGubun%22%3A%22MAIN%22%2C%22finGubun%22%3A%22MAIN%22%2C%22cTB00%22%3A%22cns_td20%22%7D%5D; _gid=GA1.3.1069169000.1703492095; ASP.NET_SessionId=wos4nhn10aa0x5gt2liw0pao; _gat_gtag_UA_74989022_7=1; _ga=GA1.1.438763864.1702303131; _ga_KEHSJRBTJS=GS1.1.1703492094.4.1.1703493227.0.0.0",
-        "Host": "navercomp.wisereport.co.kr",
-        "Referer": f"https://navercomp.wisereport.co.kr/v2/company/c1010001.aspx?cmp_cd={code}",
-        "Sec-Fetch-Dest": "empty",
-        "Sec-Fetch-Mode": "cors",
-        "Sec-Fetch-Site": "same-origin",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        "X-Requested-With": "XMLHttpRequest",
-        "sec-ch-ua": "\"Not_A Brand\";v=\"8\", \"Chromium\";v=\"120\", \"Google Chrome\";v=\"120\"",
-        "sec-ch-ua-mobile": "?0",
-        "sec-ch-ua-platform": "\"Windows\""
-        }       
-    htmltext = requests.get(url_kor, headers= headers1).text
-    keys = ['1M momentum', '3M momentum','6M momentum','1Y momentum','stockprice']
+    code = 'p'+ code
+    current_price = get_stock_price(corp_code= code, market_pass= market_path)
+    if current_price:
+        data['preffered_stockprice'] = current_price
+    else:
+        data['preffered_stockprice'] = data['stockprice']
+
+def corp_price(market_path,code):
+    '''
+    corp_price는 stock code를 input으로 받아 다음 key를 가지는 dic 반환한다
+    ['1M momentum', '3M momentum','6M momentum','1Y momentum','stockprice']
+    input: stock code
+    '''
+    keys = {'1M momentum':1,
+             '3M momentum':3,
+             '6M momentum':6,
+             '1Y momentum': 12}
     cont = {}
-    if htmltext and '올바른 종목이 아닙니다' not in htmltext and '접속장애' not in htmltext:
-        tree = html.fromstring(htmltext)  
-        for i in range(1,5):
-            xpath_expression = f'/html/body/div/form/div[1]/div/div[2]/div[3]/div/div/div[1]/div[1]/div[2]/table/tbody/tr[9]/td/span[{i}]'
-            momentum = tree.xpath(xpath_expression + "/text()")[0].replace("%","")
-            cont[keys[i-1]] = momentum
-        xpath_expression2 = "/html/body/div/form/div[1]/div/div[2]/div[3]/div/div/div[1]/div[1]/div[2]/table/tbody/tr[1]/td/strong"
-        price = tree.xpath(xpath_expression2 + "/text()")[0].replace("\t","").replace("\r","").replace("\n","").replace(",","")
-        cont[keys[4]] = price
-        return cont
+    current_price = get_stock_price(corp_code= code, market_pass= market_path)
+    if current_price:
+        cont['stockprice'] = current_price
+        for key in keys:
+            offset = keys[key]
+            temp_price = get_stock_price(corp_code= code, market_pass= market_path, offset= offset)
+            if temp_price: cont[key] = cal_momentum(temp_price, cont['stockprice'])
+        if len(cont.keys()) == 5: return cont
+    else:
+        return None
+
+
+def get_stock_price(corp_code: str, ymd: str, market_pass = '/data/market/price', offset: int = None):
+    '''
+    ymd : e.g. '2024.04.01'
+    '''
+    if offset:
+        date = datetime.strptime(ymd, '%Y.%m.%d')
+        next_month_date = date - relativedelta(month=offset)
+        ymd = next_month_date.strftime('%Y.%m.%d')
+
+    corp_price_path = market_pass + f"/{corp_code}"
+    if os.path.exists(corp_price_path):
+        df = pd.read_csv(corp_price_path)
+        return float(get_next_closest_price(df= df, date = ymd, Ptype= '종가'))
+    else:
+        return None
+
+####################################################################################################
 
 def corp_xbrl(self,corp_code, bsns_year, reprt_code):
     '''

@@ -16,12 +16,14 @@ class DART(API):
     from MyDart.finance import corp_stock_quantity
     
 
-    def __init__(self, bsns_year, base_url=None, base_path = "./data") -> None:
+    def __init__(self, rebalancing_date, bsns_year, base_url=None, base_path = "./data") -> None:
         if not base_url:
             base_url = 'https://opendart.fss.or.kr'
         key = self._load_key()
         self.bsns_year = bsns_year
         self.base_path = base_path
+        self.market_price_path = base_path + "/market/price"
+        self.rebalancing_date = rebalancing_date
         super().__init__(key, base_url)
         
     def _load_key(self):
@@ -49,4 +51,33 @@ class DART(API):
             with open(self.base_path + path, 'wb') as f:
                 f.write(data)
  
+    
+    def saveFlag(self, flag: str, value = None):
+        flag_path = self.base_path + '/flags'
+        if os.path.exists(flag_path):
+            with open(flag_path, 'r') as f:
+                flag_dic = json.load(f)
+            if value:
+                flag_dic[flag] = value
+            else:
+                flag_dic[flag] = 'On'
+        else:
+            flag_dic = {}
+            if value:
+                flag_dic[flag] = value
+            else:
+                flag_dic[flag] = 'On'
+        with open(flag_path, 'w') as f:
+            json.dump(flag_dic, f)    
 
+    def loadFlag(self, flag: str):
+        flag_path = self.base_path + '/flags'
+        if os.path.exists(flag_path):
+            with open(flag_path, 'r') as f:
+                flag_dic = json.load(f)
+            if flag in flag_dic:
+                return flag_dic[flag]
+            else:
+                return 'Off'
+        else:
+            return 'Off'
