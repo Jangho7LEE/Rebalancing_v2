@@ -1,6 +1,7 @@
 import os
 import pandas as pd
 import requests
+import json
 from bs4 import BeautifulSoup as bs
 from io import StringIO
 import xml.etree.ElementTree as ET
@@ -9,12 +10,15 @@ from MyDart import DART
 from MyQuant import Quant
 
 class Backtracker(object):
-    def __init__(self, rebalancing_date = '.04.15', base_path = './data/market') -> None:
+    def __init__(self, stratgy = 'VC2',rebalancing_date = '.04.15', base_path = './data/market') -> None:
         self.base_path = base_path
+        self.data_path = './data'
         self.price_path = base_path + '/price'
         self.corp_dic = {}
         self.rebalancing_date = rebalancing_date
+        self.stratgy = stratgy
 
+################################################################################################################
     def getProfit(self, target_stocks: dict, duration: int, datenow: str):
         '''
         target_stocks: target_stocks['corp_code'] = stock_code
@@ -24,15 +28,8 @@ class Backtracker(object):
         for corp_code in target_stocks:
             pass
 
-    def get_price(self, corp_code: str, date: str):
-        corp_price_csv_path = self.price_path + f'/{corp_code}.csv'
-        df = pd.read_csv(corp_price_csv_path)
-        closest_date = self.find_closest_date()
-        return df[df['날짜'] == closest_date]['종가'] 
     
-    def find_closest_date(self, df: pd.DataFrame, date: str):
-        pass
-
+################################################################################################################
     def set_market_data(self):
         corp_list = self.get_corp_list()
         corp_update_list = []
@@ -144,15 +141,20 @@ class Backtracker(object):
             else: return table[0], True
         else:
             return pd.DataFrame(), False
-
+################################################################################################################
+    '''
+    set_dart_qaunt_ready
+    Data crolling과 Qaunt stratgy를 결정하게 된다.
+    '''
+    
     def set_dart_qaunt_ready(self,bsns_year):
         base_path = f"./data/data_{bsns_year}"
-        os.makedirs(base_path)
+        if not os.path.exists(base_path): os.makedirs(base_path)
         self.newDart = DART(rebalancing_date= self.rebalancing_date,bsns_year = bsns_year, base_path = base_path)
         self.newQuant = Quant(rebalancing_date= self.rebalancing_date, bsns_year = bsns_year, base_path = base_path) 
-
+        market_corp_list = self.get_market_corp_list()
         # Qaunt init phase
-        self.quant_init()
+        self.quant_init(market_corp_list)
 
         # Data crolling phase
         self.data_crolling()
@@ -163,29 +165,81 @@ class Backtracker(object):
         #get starage
         self.qaunt()
 
-    def quant_init(self):
+    def get_market_corp_list(self):
+        clist = os.listdir(self.price_path)
+        returnlist = []
+        for corp_code in clist:
+            if not corp_code.startswith('p'): returnlist.append(corp_code.replace(".csv",""))
+        return returnlist
+
+    def quant_init(self, market_corp_list):
         self.newDart.save_corp_code()
-        self.newQuant.set_stock_dic() # code를 stock에 저장
+        self.newQuant.set_stock_dic(market_corp_list= market_corp_list) # code를 stock에 저장
 
     def data_crolling(self):
         if self.newDart.loadFlag("DataCrolling") == 'Off':
             self.newDart.get_corp_finance(self.newQuant.stock_dic)
             self.newDart.get_corp_stocknum(self.newQuant.stock_dic)
-        self.newDart.saveFlag("DataCrolling")
-        if self.newDart.loadFlag(f"PriceCrolling") == self.rebalancing_date:
+            self.newDart.saveFlag("DataCrolling")
+        if not self.newDart.loadFlag(f"PriceCrolling") == self.rebalancing_date:
             self.newDart.get_corp_price(self.newQuant.stock_dic)
-        self.newDart.saveFlag(flag= f"PriceCrolling", value=self.rebalancing_date)
+            self.newDart.saveFlag(flag= f"PriceCrolling", value=self.rebalancing_date)
         
     def data_mining(self):
         if self.newQuant.loadFlag("DataMining") == 'Off':
             self.newQuant.mining_finance()
             self.newQuant.mining_stocknum()
-        self.newQuant.saveFlag("DataMining")
-        if self.newQuant.loadFlag("MiningPrice") == self.rebalancing_date:
+            self.newQuant.saveFlag("DataMining")
+        if not self.newQuant.loadFlag("MiningPrice") == self.rebalancing_date:
             self.newQuant.mining_price()
             self.newQuant.curving_finance()
-        self.newDart.saveFlag(flag= "MiningPrice", value=self.rebalancing_date)
+            self.newDart.saveFlag(flag= "MiningPrice", value=self.rebalancing_date)
 
     def qaunt(self):
-        self.newQuant.set_score()
-        self.newQuant.quant_stratgy()
+        if not self.newQuant.loadFlag("Stratgy") == self.stratgy:
+            self.newQuant.set_score()
+            self.newQuant.quant_stratgy(st = self.stratgy)
+            self.newDart.saveFlag(flag= "Stratgy", value=self.stratgy)
+
+################################################################################################################
+    
+    def Profit_and_Loss(self, start_year, end_year):
+        if self.check_ready(start_year= start_year, end_year= end_year) == True:
+            for market_year in range(start_year, end_year+1):
+                self.get_year_profit(market_year= market_year)
+        else:
+            print('Stratgy is not ready')
+            for market_year in range(start_year, end_year+1):
+                bsns_year = str(market_year-1) 
+                self.set_dart_qaunt_ready(bsns_year=bsns_year)
+
+    def check_ready(self, start_year, end_year):
+        for market_year in range(start_year, end_year+1):
+            bsns_year = str(market_year-1)
+            if not self.stratgy_ready(bsns_year = bsns_year): return False
+        
+        return True
+    
+    def stratgy_ready(self, bsns_year):
+        flag_path = self.data_path + f'/data_{bsns_year}/flags'
+        if os.path.exists(flag_path):
+            if os.path.exists(flag_path):
+                with open(flag_path, 'r') as f:
+                    flag_dic = json.load(f)
+                if 'Stratgy' in flag_dic:
+                    if flag_dic['Stratgy'] == self.stratgy: 
+                        return True
+        return False            
+    
+##############################################################
+    def get_year_profit(self, market_year):
+        pass
+
+    def get_price(self, corp_code: str, date: str):
+        corp_price_csv_path = self.price_path + f'/{corp_code}.csv'
+        df = pd.read_csv(corp_price_csv_path)
+        closest_date = self.find_closest_date()
+        return df[df['날짜'] == closest_date]['종가'] 
+    
+    def find_closest_date(self, df: pd.DataFrame, date: str):
+        pass                

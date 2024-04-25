@@ -16,18 +16,20 @@ class DART(API):
     from MyDart.finance import corp_stock_quantity
     
 
-    def __init__(self, rebalancing_date, bsns_year, base_url=None, base_path = "./data") -> None:
+    def __init__(self, rebalancing_date, bsns_year, base_path, base_url=None) -> None:
         if not base_url:
             base_url = 'https://opendart.fss.or.kr'
-        key = self._load_key()
         self.bsns_year = bsns_year
         self.base_path = base_path
-        self.market_price_path = base_path + "/market/price"
+        self.key_path = './data/key.txt'
+        key = self._load_key()
+        self.market_price_path = "data/market/price"
         self.rebalancing_date = rebalancing_date
+        self.ymd = str(int(bsns_year)+1) + rebalancing_date # bsns year은 연결 기준이므로 다음 년도 가 ymd이다
         super().__init__(key, base_url)
         
     def _load_key(self):
-        data_path = self.base_path + "/key.txt"
+        data_path = self.key_path
         with open(data_path, 'r') as f:
             return f.readline()
 

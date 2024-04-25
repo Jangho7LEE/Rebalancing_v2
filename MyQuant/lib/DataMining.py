@@ -10,7 +10,11 @@ def mining_finance(self):
             self.stock_dic[corp_code].financestate = set_financestate(financial_list = finance_dic['list'])
         else:
             self.stock_dic[corp_code].financestate['status'] = 0  
-    self.save_stock_dic()
+    stocks = list(self.stock_dic.keys())
+    for s in stocks:
+        if self.stock_dic[s].financestate['status'] == 0:
+            del self.stock_dic[s]
+    
 
 def mining_stocknum(self):
     corp_code_in_price = os.listdir(self.stocknum_path)
@@ -21,20 +25,26 @@ def mining_stocknum(self):
             set_stocknum(stocknum_list = stocknum_dic['list'], input_dic= self.stock_dic[corp_code].financestate)
         else: 
             self.stock_dic[corp_code].financestate['status'] = 0
+    stocks = list(self.stock_dic.keys())
+    for s in stocks:
+        if self.stock_dic[s].financestate['status'] == 0:
+            del self.stock_dic[s]
     self.save_stock_dic()
 
 def set_stocknum(stocknum_list, input_dic):
     stock_keyword =['의결권있는주식', '의결권주식', '의결권이있는주식', '의결권有', '의결권있는주식수']
     prefferd_stock_keyword = ['의결권없는주식', '무의결권주식']
+    input_dic['status'] = 0
     for dic in stocknum_list:
         if 'distb_stock_co' in dic and dic['se'] !='비고' and dic['distb_stock_co'] != '-':
             se = dic['se'].replace(" ","").replace("\t","").replace("\n","")
             if '보통' in se or se in stock_keyword : 
                 input_dic['보통주'] = float(dic['distb_stock_co'].replace(",",""))
+                input_dic['status'] = 1
             elif '우선' in se or se in prefferd_stock_keyword :
                 input_dic['우선주'] = float(dic['distb_stock_co'].replace(",",""))
-            else:
-                input_dic['status'] = 0
+            
+                
             
 
 def mining_price(self):

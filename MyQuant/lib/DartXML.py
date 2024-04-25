@@ -3,7 +3,7 @@ import os
 from MyQuant.lib.stock.stock import stock
 
 
-def set_stock_dic(self, reset = 0):
+def set_stock_dic(self, market_corp_list,reset = 0):
     '''
     set_stock_dic은 저장된 stock_dic json file을 불러와 stock_dic에 저장하거나
     CORPCODE.xml을 통해 불러온다 
@@ -12,9 +12,9 @@ def set_stock_dic(self, reset = 0):
     if os.path.exists(data_path) and reset == 0:
         self.load_stock_dic(data_path = data_path)
     else:
-        self.corp_code_to_stock()
+        self.corp_code_to_stock(market_corp_list = market_corp_list)
 
-def corp_code_to_stock(self):
+def corp_code_to_stock(self, market_corp_list):
     """
     CORPCODE.xml 파일을 stock_dic에 옮긴 후 dictionary를 json dump
     이때, stock code가 있는 (상장주)만 stock_dic에 포함된다.
@@ -23,7 +23,8 @@ def corp_code_to_stock(self):
     root = self.openfile(data_path).getroot()
     for child in root:
         new_stock = node_to_stock(child)
-        if new_stock: self.stock_dic[new_stock.corp_code] = new_stock
+        if new_stock: 
+            if new_stock.corp_code in market_corp_list:self.stock_dic[new_stock.corp_code] = new_stock
     self.save_stock_dic()
 
 

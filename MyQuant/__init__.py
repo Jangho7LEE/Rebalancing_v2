@@ -1,5 +1,6 @@
 from MyQuant.lib.DataManager import DataManager
 from scipy.stats import percentileofscore
+import os
 import pandas as pd
 
 class Quant(DataManager):
@@ -81,6 +82,7 @@ class Quant(DataManager):
             self.stock_dic[s].valuestate[value]['score'] = points_dict[s]
             
     def quant_stratgy(self, st ='VC2'):
+        if not os.path.exists(self.base_path + "/stratgy"): os.makedirs(self.base_path + "/stratgy")
         if st == 'VC2': # 추세형 가치주 포트폴리오(전체 주식 VC2 상위 10%, 6개월 가격 모멘텀 (상위 25종목)
             self.quant_VC2()
         elif st == 'TGS':
@@ -98,7 +100,7 @@ class Quant(DataManager):
         score_cutline = self.score_df['Total Score'].quantile(0.9)
         self.stratgy_df = self.score_df[self.score_df['Total Score'] >= score_cutline]
         self.stratgy_df = self.stratgy_df.sort_values(by= '6M momentum', ascending= False)
-        print(self.stratgy_df.head(25).to_csv('VC2.csv'))
+        self.stratgy_df.head(25).to_csv(self.base_path + '/stratgy/VC2.csv')
 
     def quant_TGS(self):
         pass

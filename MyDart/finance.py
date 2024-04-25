@@ -1,5 +1,5 @@
-from MyBacktracker.lib import get_next_closest_price
-from MyBacktracker.lib import cal_momentum
+from lib import get_next_closest_price
+from lib import cal_momentum
 from MyDart.lib.utils import check_required_parameters
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
@@ -16,10 +16,12 @@ def get_corp_finance(self,stock_dic, reset = 0):
     '''
     corp_code_list = list(stock_dic.keys())
     if reset == 0:
+        if not os.path.exists(self.base_path + "/finance"): os.makedirs(self.base_path + "/finance")
         saved_corp_code_list = os.listdir(self.base_path + "/finance")
         target_list = [s for s in corp_code_list if s not in saved_corp_code_list]
         self.save_corp_finance(target_list)
     elif reset == 1:
+        if not os.path.exists(self.base_path + "/finance"): os.makedirs(self.base_path + "/finance")
         self.save_corp_finance(corp_code_list)
     else:
         raise KeyError('Invalid input param: check reset!')
@@ -86,10 +88,12 @@ def get_corp_stocknum(self,stock_dic, reset = 0):
     '''
     corp_code_list = list(stock_dic.keys())
     if reset == 0:
+        if not os.path.exists(self.base_path + "/stocknum"): os.makedirs(self.base_path + "/stocknum")
         saved_corp_code_list = os.listdir(self.base_path + "/stocknum")
         target_list = [s for s in corp_code_list if s not in saved_corp_code_list]
         self.save_corp_stock_num(target_list)
     elif reset == 1:
+        if not os.path.exists(self.base_path + "/stocknum"): os.makedirs(self.base_path + "/stocknum")
         self.save_corp_stock_num(corp_code_list)
     else:
         raise KeyError('Invalid input param: check reset!')
@@ -118,44 +122,44 @@ def corp_stock_quantity(self,corp_code, bsns_year, reprt_code):
 ####################################################################################################
 def get_corp_price(self, stock_dic, reset = 0):
     '''
-    get_corp_price list에 존재하는 기업의 네이버 주식 기준 가격상황을 들고온다.
-    input: 
-        reset: 0) data/price에 있는 기업은 가져오지 않는다
-               1) 리스트 기업의 가격상황을 들고온다
+    Markey price에 저장된 값을 통해 price를 읽어온다
     '''
     corp_code_list = list(stock_dic.keys())
     if reset == 0:
+        if not os.path.exists(self.base_path + "/price"): os.makedirs(self.base_path + "/price")
         saved_corp_code_list = os.listdir(self.base_path + "/price")
         target_list = [s for s in corp_code_list if s not in saved_corp_code_list]
         self.save_corp_price(target_list, stock_dic)
     elif reset == 1:
+        if not os.path.exists(self.base_path + "/price"): os.makedirs(self.base_path + "/price")
         self.save_corp_price(corp_code_list, stock_dic)
     else:
         raise KeyError('Invalid input param: check reset!')
     pass
 
 def save_corp_price(self, corp_code_list, stock_dic):
+    ymd = self.ymd
     for corp_code in corp_code_list:
-        data = corp_price(market_path = self.market_price_path, corp_code = corp_code)
+        data = corp_price(market_path = self.market_price_path, corp_code = corp_code, ymd = ymd)
         if data:
             if '우선주' in stock_dic[corp_code].financestate:
-                prefered_corp_price(market_path = self.market_price_path, code = corp_code, data= data)
+                prefered_corp_price(market_path = self.market_price_path, code = corp_code, data= data, ymd = ymd)
             self._save_file(path = f"/price/{corp_code}",data= data)
         
-def prefered_corp_price(market_path, code,data):
+def prefered_corp_price(market_path, code,data, ymd):
     '''
     corp_price는 stock code를 input으로 받아 다음 key를 가지는 dic 반환한다
     ['1M momentum', '3M momentum','6M momentum','1Y momentum','stockprice']
     input: stock code
     '''
     code = 'p'+ code
-    current_price = get_stock_price(corp_code= code, market_pass= market_path)
+    current_price = get_stock_price(corp_code= code, market_pass= market_path,  ymd = ymd)
     if current_price:
         data['preffered_stockprice'] = current_price
     else:
         data['preffered_stockprice'] = data['stockprice']
 
-def corp_price(market_path,code):
+def corp_price(market_path,corp_code, ymd):
     '''
     corp_price는 stock code를 input으로 받아 다음 key를 가지는 dic 반환한다
     ['1M momentum', '3M momentum','6M momentum','1Y momentum','stockprice']
@@ -166,12 +170,12 @@ def corp_price(market_path,code):
              '6M momentum':6,
              '1Y momentum': 12}
     cont = {}
-    current_price = get_stock_price(corp_code= code, market_pass= market_path)
+    current_price = get_stock_price(corp_code= corp_code, market_pass= market_path, ymd = ymd)
     if current_price:
         cont['stockprice'] = current_price
         for key in keys:
             offset = keys[key]
-            temp_price = get_stock_price(corp_code= code, market_pass= market_path, offset= offset)
+            temp_price = get_stock_price(corp_code= corp_code, market_pass= market_path, offset= offset,  ymd = ymd)
             if temp_price: cont[key] = cal_momentum(temp_price, cont['stockprice'])
         if len(cont.keys()) == 5: return cont
     else:
@@ -184,13 +188,15 @@ def get_stock_price(corp_code: str, ymd: str, market_pass = '/data/market/price'
     '''
     if offset:
         date = datetime.strptime(ymd, '%Y.%m.%d')
-        next_month_date = date - relativedelta(month=offset)
+        next_month_date = date - relativedelta(months=offset)
         ymd = next_month_date.strftime('%Y.%m.%d')
 
-    corp_price_path = market_pass + f"/{corp_code}"
+    corp_price_path = market_pass + f"/{corp_code}.csv"
     if os.path.exists(corp_price_path):
         df = pd.read_csv(corp_price_path)
-        return float(get_next_closest_price(df= df, date = ymd, Ptype= '종가'))
+        price = get_next_closest_price(df= df, date = ymd, Ptype= '종가')
+        if price: return float(price)
+        else: return None
     else:
         return None
 
