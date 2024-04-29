@@ -30,14 +30,14 @@ class Quant(DataManager):
     def _stockdic_to_df(self,rlist, addlist, adjust_val):
         df_dic = {}
         for s in self.stock_dic:
-            df_dic[self.stock_dic[s].corp_name] = self._lists_to_dic(self.stock_dic[s], rlist, addlist)
+            df_dic[self.stock_dic[s].corp_name] = self._lists_to_dic(s, self.stock_dic[s], rlist, addlist)
         self.score_df = pd.DataFrame(df_dic).transpose()
         self._cal_total_score(rlist, adjust_val)
         self.score_df = self.score_df.sort_values(by= 'Total Score', ascending= False)
         
 
-    def _lists_to_dic(self,stock,rlist, addlist):
-        temp_dic = {}
+    def _lists_to_dic(self,corp_code, stock,rlist, addlist):
+        temp_dic = {'corp_code': corp_code}
         for v in rlist:
             temp_dic[v] = stock.valuestate[v]['value']
             temp_dic[v + ' score'] = stock.valuestate[v]['score']

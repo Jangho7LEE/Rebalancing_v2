@@ -1,4 +1,8 @@
 import pandas as pd
+import os
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
+
 def get_next_closest_price(df, date, Ptype = '종가'):
     """
     DataFrame(df)에서 주어진 날짜(date) 이후의 가장 가까운 다음 날짜의 Ptype('종가') 값을 반환하는 함수.
@@ -26,7 +30,7 @@ def get_next_closest_price(df, date, Ptype = '종가'):
         return None
     
     
-    return df.at[next_date_idx, '종가']
+    return df.at[next_date_idx, Ptype]
 
 
 def cal_momentum(a, b):
@@ -42,3 +46,51 @@ def cal_momentum(a, b):
     
     # 소수점 둘째 자리까지 반올림하여 반환
     return round(percentage_change, 2)
+
+def get_stock_price(corp_code: str, ymd: str, market_pass = './data/market/price', offset: int = None):
+    '''
+    ymd : e.g. '2024.04.01'
+    '''
+    if offset:
+        date = datetime.strptime(ymd, '%Y.%m.%d')
+        next_month_date = date - relativedelta(months=offset)
+        ymd = next_month_date.strftime('%Y.%m.%d')
+
+    corp_price_path = market_pass + f"/{corp_code}.csv"
+    if os.path.exists(corp_price_path):
+        df = pd.read_csv(corp_price_path)
+        price = get_next_closest_price(df= df, date = ymd, Ptype= '종가')
+        if price: return float(price)
+        else: return None
+    else:
+        return None
+
+def get_index_price(index_name: str, ymd: str, index_path = './data/market/index', offset: int = None):
+    '''
+    ymd : e.g. '2024.04.01'
+    '''
+    if offset:
+        date = datetime.strptime(ymd, '%Y.%m.%d')
+        next_month_date = date - relativedelta(months=offset)
+        ymd = next_month_date.strftime('%Y.%m.%d')
+
+    index_price_path = index_path + f"/{index_name}.csv"
+    if os.path.exists(index_price_path):
+        df = pd.read_csv(index_price_path)
+        price = get_next_closest_price(df= df, date = ymd, Ptype= '체결가')
+        if price: return float(price)
+        else: return None
+    else:
+        return None
+
+def get_corp_profit(corp_code: str, start_ymd: str, end_ymd: str):
+    a = get_stock_price(corp_code = corp_code,ymd= start_ymd)
+    b = get_stock_price(corp_code= corp_code, ymd= end_ymd)
+    if a and b: return cal_momentum(a,b)
+    else: return None
+    
+def get_index_profit(index_name: str, start_ymd: str, end_ymd: str):    
+    a = get_index_price(index_name = index_name,ymd= start_ymd)
+    b = get_index_price(index_name= index_name, ymd= end_ymd)
+    if a and b: return cal_momentum(a,b)
+    else: return None

@@ -1,12 +1,8 @@
-from lib import get_next_closest_price
 from lib import cal_momentum
+from lib import get_stock_price
 from MyDart.lib.utils import check_required_parameters
-from datetime import datetime
-from dateutil.relativedelta import relativedelta
-from lxml import html
-import pandas as pd
-import requests
 import os
+
 def get_corp_finance(self,stock_dic, reset = 0):
     '''
     get_corp_finance는 list에 존재하는 기업의 재무재표를 가져와 stock_dic에 저장한다.
@@ -182,23 +178,6 @@ def corp_price(market_path,corp_code, ymd):
         return None
 
 
-def get_stock_price(corp_code: str, ymd: str, market_pass = '/data/market/price', offset: int = None):
-    '''
-    ymd : e.g. '2024.04.01'
-    '''
-    if offset:
-        date = datetime.strptime(ymd, '%Y.%m.%d')
-        next_month_date = date - relativedelta(months=offset)
-        ymd = next_month_date.strftime('%Y.%m.%d')
-
-    corp_price_path = market_pass + f"/{corp_code}.csv"
-    if os.path.exists(corp_price_path):
-        df = pd.read_csv(corp_price_path)
-        price = get_next_closest_price(df= df, date = ymd, Ptype= '종가')
-        if price: return float(price)
-        else: return None
-    else:
-        return None
 
 ####################################################################################################
 
