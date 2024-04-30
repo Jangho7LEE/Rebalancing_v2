@@ -11,4 +11,5 @@ myback = Backtracker(stratgy = 'VC2',rebalancing_date = rebalancing_date, base_p
 #2023
 start_year = 2020
 end_year = 2024
+myback.del_all_stratgy_flag(start_year= start_year, end_year= end_year)
 myback.Profit_and_Loss(start_year = start_year, end_year= end_year)

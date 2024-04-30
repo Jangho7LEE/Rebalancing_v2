@@ -90,10 +90,10 @@ class Quant(DataManager):
             
 
     def quant_VC2(self):
-        # rlist =['PBR', 'PER', 'PSR', 'EE', 'PCR','DIV'] # in valuestate
-        # adjust_val = [1.105929355280393, 0.9430336648179733, 1.4643396915758484, 2.352206654626052, 1.153208866905027, 0.2610796835633595]
-        rlist =['PER', 'PSR', 'EE', 'PCR'] # in valuestate
-        adjust_val = [ 0.9430336648179733, 1.4643396915758484, 2.352206654626052, 1.153208866905027]
+        rlist =['PBR', 'PER', 'PSR', 'EE', 'PCR','DIV'] # in valuestate
+        adjust_val = [0.2, 0.9430336648179733, 2.4643396915758484, 2.352206654626052, 1.153208866905027, 0.2610796835633595]
+        # rlist =['PER', 'PSR', 'EE', 'PCR'] # in valuestate
+        # adjust_val = [ 0.9430336648179733, 1.4643396915758484, 2.352206654626052, 1.153208866905027]
         addlist =['6M momentum'] # in financestate
         self._ceck_required_value(rlist)
         self._stockdic_to_df(rlist, addlist, adjust_val)
@@ -102,5 +102,6 @@ class Quant(DataManager):
         self.stratgy_df = self.stratgy_df.sort_values(by= '6M momentum', ascending= False)
         self.stratgy_df.head(25).to_csv(self.base_path + '/stratgy/VC2.csv')
 
+    
     def quant_TGS(self):
         pass

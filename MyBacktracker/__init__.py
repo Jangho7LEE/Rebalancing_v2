@@ -304,8 +304,8 @@ class Backtracker(object):
             plt.plot(x, cum_y[key], color=color_list[i%color_len], linewidth=2, linestyle='--', marker='o', markersize=8, label = key)
         # 그래프 제목과 축 레이블 추가
         plt.title('Total_PNL')
-        plt.xlabel('Cumulative PNL')
-        plt.ylabel('PNL')
+        plt.xlabel('year')
+        plt.ylabel('Cumulative PNL')
         plt.legend()
         plt.grid(True, which='both')
 
@@ -347,18 +347,16 @@ class Backtracker(object):
     def del_stratgy_flag(self, bsns_year):
         flag_path = self.data_path + f'/data_{bsns_year}/flags'
         if os.path.exists(flag_path):
-            if os.path.exists(flag_path):
-                with open(flag_path, 'r') as f:
-                    flag_dic = json.load(f)
-                del flag_dic['Stratgy']
-                with open(flag_path, 'r') as f:
-                    flag_dic = json.load(f)    
+            with open(flag_path, 'r') as f:
+                flag_dic = json.load(f)
+            del flag_dic['Stratgy']
+            with open(flag_path, 'w') as f:
+                json.dump(flag_dic, f)    
 #-----------------------------------------------------------------------------------------------------------------
     def load_stratgy_corp_code(self, bsns_year):
         stratgy_path = self.data_path + f'/data_{bsns_year}/stratgy/{self.stratgy}.csv'
         df = pd.read_csv(stratgy_path, dtype= {'corp_code': str})
         return df['corp_code'].tolist()
-    
     
     def get_corps_year_profit(self, market_year, index_list =['KOSTPI']):
         bsns_year = str(int(market_year)-1)
