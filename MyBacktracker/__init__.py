@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 from MyBacktracker.lib import node_to_stock
 from MyDart import DART
 from MyQuant import Quant
-from lib import get_corp_profit, get_index_profit
+from lib import get_corp_profit, get_index_profit, get_next_ymd
 class Backtracker(object):
     def __init__(self, stratgy = 'VC2',rebalancing_date = '.04.15', base_path = './data/market') -> None:
         self.base_path = base_path
@@ -264,7 +264,7 @@ class Backtracker(object):
         if self.check_ready(start_year= start_year, end_year= end_year) == True:
             Tot_PNL_dic = {}
             for market_year in range(start_year, end_year): # endyear-1 만큼만 시뮬가능하니까,
-                Tot_PNL_dic[market_year+1] = self.get_corps_year_profit(market_year= str(market_year), index_list= index_list)
+                Tot_PNL_dic.update(self.get_corps_year_profit(market_year= str(market_year), index_list= index_list))
             self.plot_profit_Dic(Tot_PNL_dic, index_list= index_list)
         else:
             print('Stratgy is not ready')
@@ -284,19 +284,22 @@ class Backtracker(object):
                 else:
                     y[index_name] =[Tot_PNL_dic[key][index_name]]
                     
-        plt.figure(1)
+        plt.figure(1, figsize=(15, 6))
         color_list = ['r', 'k', 'b', 'g', 'm']
         color_len = len(color_list)
+        width = 0.8
         for i,key in enumerate(y):
-            plt.plot(x, y[key], color=color_list[i%color_len], linewidth=2, linestyle='--', marker='o', markersize=8, label = key)
+            width *= 0.9
+            plt.bar(x, y[key], color=color_list[i%color_len],label = key,  width=width, alpha = 0.7)
         # 그래프 제목과 축 레이블 추가
         plt.title('Total_PNL')
-        plt.xlabel('해당 년 수익')
+        plt.xlabel(f'1 month')
         plt.ylabel('PNL')
+        plt.xticks(rotation=80)
         plt.legend()
         plt.grid(True, which='both')
 
-        plt.figure(2)
+        plt.figure(2, figsize=(15, 6))
         color_list = ['r', 'k', 'b', 'g', 'm']
         color_len = len(color_list)
         cum_y = self.cal_cum_pnl(y)
@@ -304,8 +307,9 @@ class Backtracker(object):
             plt.plot(x, cum_y[key], color=color_list[i%color_len], linewidth=2, linestyle='--', marker='o', markersize=8, label = key)
         # 그래프 제목과 축 레이블 추가
         plt.title('Total_PNL')
-        plt.xlabel('year')
+        plt.xlabel('1 month')
         plt.ylabel('Cumulative PNL')
+        plt.xticks(rotation=80)
         plt.legend()
         plt.grid(True, which='both')
 
@@ -349,7 +353,7 @@ class Backtracker(object):
         if os.path.exists(flag_path):
             with open(flag_path, 'r') as f:
                 flag_dic = json.load(f)
-            del flag_dic['Stratgy']
+            if 'Stratgy' in flag_dic: del flag_dic['Stratgy']
             with open(flag_path, 'w') as f:
                 json.dump(flag_dic, f)    
 #-----------------------------------------------------------------------------------------------------------------
@@ -361,22 +365,29 @@ class Backtracker(object):
     def get_corps_year_profit(self, market_year, index_list =['KOSTPI']):
         bsns_year = str(int(market_year)-1)
         corp_list = self.load_stratgy_corp_code(bsns_year)
-        profit_dic = {'Total_PNL': 0.0}
-        start_ymd = market_year + self.rebalancing_date
-        end_ymd = str(int(market_year)+1)+ self.rebalancing_date
-        count = 0
-        for corp in corp_list:
-            profit = get_corp_profit(corp_code= corp, start_ymd= start_ymd, end_ymd= end_ymd)
-            if profit:
-                count +=1
-                profit_dic[corp] = profit
-                profit_dic['Total_PNL'] += profit
-        for index_name in index_list:
-            index_profit = get_index_profit(index_name= index_name, start_ymd= start_ymd, end_ymd= end_ymd)
-            if profit:
-                profit_dic[index_name] = index_profit
-        profit_dic['Total_PNL'] /= count
-        return profit_dic
-
+        return_dic ={}
+        init_ymd = market_year + self.rebalancing_date
+        for i in range(1,13):
+            profit_dic = {'Total_PNL': 0.0}
+            start_ymd = get_next_ymd(ymd = init_ymd, nexttype='M', offset= i-1)
+            end_ymd = get_next_ymd(ymd = init_ymd, nexttype='M', offset= i)
+            count = 0
+            for corp in corp_list:
+                profit = get_corp_profit(corp_code= corp, start_ymd= start_ymd, end_ymd= end_ymd)
+                if not profit == None:
+                    count +=1
+                    profit_dic[corp] = profit
+                    profit_dic['Total_PNL'] += profit
+                else:
+                    print(corp)
+                    get_corp_profit(corp_code= corp, start_ymd= start_ymd, end_ymd= end_ymd)
+            for index_name in index_list:
+                index_profit = get_index_profit(index_name= index_name, start_ymd= start_ymd, end_ymd= end_ymd)
+                if index_profit:
+                    profit_dic[index_name] = index_profit
+            profit_dic['Total_PNL'] /= count
+            return_dic[end_ymd] = profit_dic
+        return return_dic
+    
 ################################################################################################################
      

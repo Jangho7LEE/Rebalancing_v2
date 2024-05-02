@@ -32,6 +32,20 @@ def get_next_closest_price(df, date, Ptype = '종가'):
     
     return df.at[next_date_idx, Ptype]
 
+def get_next_ymd(ymd = '1999.01.01', nexttype ='M', offset = 1):
+    '''
+    nexttype: Y: year
+              M: month
+              D: day
+    '''
+    date = datetime.strptime(ymd, '%Y.%m.%d')
+    if nexttype == 'Y': next_date = date + relativedelta(years=offset)
+    if nexttype == 'M': next_date = date + relativedelta(months=offset)
+    if nexttype == 'D': next_date = date + relativedelta(days=offset)
+    return next_date.strftime('%Y.%m.%d')
+
+    
+
 
 def cal_momentum(a, b):
     """

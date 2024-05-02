@@ -32,12 +32,72 @@ class Quant(DataManager):
         for s in self.stock_dic:
             df_dic[self.stock_dic[s].corp_name] = self._lists_to_dic(s, self.stock_dic[s], rlist, addlist)
         self.score_df = pd.DataFrame(df_dic).transpose()
+        # self.score_df = self.quant_Delete_holdingCorp(self.score_df)
         self._cal_total_score(rlist, adjust_val)
         self.score_df = self.score_df.sort_values(by= 'Total Score', ascending= False)
         
+    def quant_Delete_holdingCorp(self,df):
+        hold_Corp_list =[
+                    '092230',
+                    '034730',
+                    '002030',
+                    '001800',
+                    '002020',
+                    '363280',
+                    '004150',
+                    '042420',
+                    '006840',
+                    '001040',
+                    '139130',
+                    '084690',
+                    '003090',
+                    '000070',
+                    '138930',
+                    '000210',
+                    '006040',
+                    '055550',
+                    '000140',
+                    '003300',
+                    '078070',
+                    '383800',
+                    '402340',
+                    '025530',
+                    '900140',
+                    '000240',
+                    '027410',
+                    '001940',
+                    '035810',
+                    '078930',
+                    '003550',
+                    '012320',
+                    '071050',
+                    '003380',
+                    '175330',
+                    '002790',
+                    '015360',
+                    '000700',
+                    '010770',
+                    '003480',
+                    '180640',
+                    '054800',
+                    '007700',
+                    '267250',
+                    '060980',
+                    '035000',
+                    '000320',
+                    '072710',
+                    '004990',
+                    '058650',
+                    '316140',
+                    '035610',
+                    '028080',
 
+        ]
+        return df[~df['stock_code'].isin(hold_Corp_list)]
+    
     def _lists_to_dic(self,corp_code, stock,rlist, addlist):
-        temp_dic = {'corp_code': corp_code}
+        temp_dic = {'corp_code': corp_code,
+                    'stock_code': stock.stock_code}
         for v in rlist:
             temp_dic[v] = stock.valuestate[v]['value']
             temp_dic[v + ' score'] = stock.valuestate[v]['score']
@@ -86,22 +146,34 @@ class Quant(DataManager):
         if st == 'VC2': # 추세형 가치주 포트폴리오(전체 주식 VC2 상위 10%, 6개월 가격 모멘텀 (상위 25종목)
             self.quant_VC2()
         elif st == 'TGS':
-            pass
+            self.quant_TGS()
             
 
     def quant_VC2(self):
         rlist =['PBR', 'PER', 'PSR', 'EE', 'PCR','DIV'] # in valuestate
         adjust_val = [0.2, 0.9430336648179733, 2.4643396915758484, 2.352206654626052, 1.153208866905027, 0.2610796835633595]
+        # adjust_val = [1,1,1,1,1,1]
         # rlist =['PER', 'PSR', 'EE', 'PCR'] # in valuestate
         # adjust_val = [ 0.9430336648179733, 1.4643396915758484, 2.352206654626052, 1.153208866905027]
         addlist =['6M momentum'] # in financestate
         self._ceck_required_value(rlist)
         self._stockdic_to_df(rlist, addlist, adjust_val)
-        score_cutline = self.score_df['Total Score'].quantile(0.9)
+        
+        score_cutline = self.score_df['Total Score'].quantile(0.80)
         self.stratgy_df = self.score_df[self.score_df['Total Score'] >= score_cutline]
         self.stratgy_df = self.stratgy_df.sort_values(by= '6M momentum', ascending= False)
-        self.stratgy_df.head(25).to_csv(self.base_path + '/stratgy/VC2.csv')
+        self.stratgy_df.head(30).to_csv(self.base_path + '/stratgy/VC2.csv')
 
     
     def quant_TGS(self):
-        pass
+        rlist =['PER', 'PSR', 'EE'] # in valuestate
+        adjust_val = [1,1,1]
+        # rlist =['PER', 'PSR', 'EE', 'PCR'] # in valuestate
+        # adjust_val = [ 0.9430336648179733, 1.4643396915758484, 2.352206654626052, 1.153208866905027]
+        addlist =['3M momentum'] # in financestate
+        self._ceck_required_value(rlist)
+        self._stockdic_to_df(rlist, addlist, adjust_val)
+        score_cutline = self.score_df['Total Score'].quantile(0.9)
+        self.stratgy_df = self.score_df[self.score_df['Total Score'] >= score_cutline]
+        self.stratgy_df = self.stratgy_df.sort_values(by= '3M momentum', ascending= False)
+        self.stratgy_df.head(25).to_csv(self.base_path + '/stratgy/TGS.csv')
