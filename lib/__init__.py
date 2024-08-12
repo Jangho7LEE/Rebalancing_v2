@@ -15,7 +15,7 @@ def get_next_closest_price(df, date, Ptype = '종가'):
     date_str = pd.to_datetime(date).strftime('%Y.%m.%d')
     
     # 주어진 날짜 이후의 데이터만 필터링
-    filtered_df = df[df['날짜'] > date_str]
+    filtered_df = df[df['날짜'] >= date_str]
     
     # 만약 주어진 날짜 이후의 데이터가 없다면 None 반환
     if filtered_df.empty:

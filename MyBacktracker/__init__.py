@@ -96,9 +96,10 @@ class Backtracker(object):
         date_checker = True
         while(date_checker and page_exist):
             new_page, page_exist = self.get_market_data_page(stock_code= stock_code, page= page)
-            date_checker, new_page = self.update_checker(new_page,last_date)
-            df = pd.concat([new_page.dropna(),df]).reset_index(drop=True)
-            page += 1
+            if page_exist:
+                date_checker, new_page = self.update_checker(new_page,last_date)
+                df = pd.concat([new_page.dropna(),df]).reset_index(drop=True)
+                page += 1
         df.to_csv(self.price_path + f'/{corp_code}.csv') 
 
     def update_checker(self,df,last_date):
@@ -234,11 +235,11 @@ class Backtracker(object):
 
     def data_crolling(self):
         if self.newDart.loadFlag("DataCrolling") == 'Off':
-            self.newDart.get_corp_finance(self.newQuant.stock_dic)
-            self.newDart.get_corp_stocknum(self.newQuant.stock_dic)
+            self.newDart.get_corp_finance(self.newQuant.stock_dic, reset= 1)
+            self.newDart.get_corp_stocknum(self.newQuant.stock_dic, reset= 1)
             self.newDart.saveFlag("DataCrolling")
         if not self.newDart.loadFlag(f"PriceCrolling") == self.rebalancing_date:
-            self.newDart.get_corp_price(self.newQuant.stock_dic)
+            self.newDart.get_corp_price(self.newQuant.stock_dic, reset= 1)
             self.newDart.saveFlag(flag= f"PriceCrolling", value=self.rebalancing_date)
         
     def data_mining(self):
@@ -343,17 +344,17 @@ class Backtracker(object):
                         return True
         return False    
     
-    def del_all_stratgy_flag(self, start_year, end_year):
+    def del_all_flag(self, start_year, end_year, flag_name):
         for market_year in range(start_year, end_year+1):
             bsns_year = str(market_year-1)        
-            self.del_stratgy_flag(bsns_year= bsns_year)
+            self.del_flag(bsns_year= bsns_year, flag_name = flag_name)
 
-    def del_stratgy_flag(self, bsns_year):
+    def del_flag(self, bsns_year, flag_name):
         flag_path = self.data_path + f'/data_{bsns_year}/flags'
         if os.path.exists(flag_path):
             with open(flag_path, 'r') as f:
                 flag_dic = json.load(f)
-            if 'Stratgy' in flag_dic: del flag_dic['Stratgy']
+            if  flag_name in flag_dic: del flag_dic[flag_name]
             with open(flag_path, 'w') as f:
                 json.dump(flag_dic, f)    
 #-----------------------------------------------------------------------------------------------------------------

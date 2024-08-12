@@ -147,7 +147,30 @@ class Quant(DataManager):
             self.quant_VC2()
         elif st == 'TGS':
             self.quant_TGS()
-            
+        elif st == 'Mine':
+            self.quant_Mine()
+        elif st == "steady_PER":
+            self.quant_STPER()
+    
+    def quant_STPER(self):
+        rlist =['steady_PER', 'EE']
+        adjust_val = [1, 1]
+        self._ceck_required_value(rlist)
+        
+
+    def quant_Mine(self):
+        rlist =['PBR', 'PER', 'PSR', 'EE', 'PCR','DIV'] # in valuestate
+        adjust_val = [0.2, 0.9430336648179733, 2.4643396915758484, 2.352206654626052, 1.153208866905027, 0.2610796835633595]
+        addlist =['6M momentum','3M momentum'] # in financestate
+        self._ceck_required_value(rlist)
+        self._stockdic_to_df(rlist, addlist, adjust_val)
+        momentum6_cutline = self.score_df['6M momentum'].quantile(0.5)
+        momentum3_cutline = self.score_df['3M momentum'].quantile(0.5)
+        self.stratgy_df = self.score_df[self.score_df['6M momentum'] >= momentum6_cutline]
+        self.stratgy_df = self.score_df[self.score_df['3M momentum'] >= momentum3_cutline]
+
+        self.stratgy_df = self.stratgy_df.sort_values(by= 'Total Score', ascending= False)
+        self.stratgy_df.head(25).to_csv(self.base_path + '/stratgy/MINE.csv')
 
     def quant_VC2(self):
         rlist =['PBR', 'PER', 'PSR', 'EE', 'PCR','DIV'] # in valuestate
@@ -159,10 +182,10 @@ class Quant(DataManager):
         self._ceck_required_value(rlist)
         self._stockdic_to_df(rlist, addlist, adjust_val)
         
-        score_cutline = self.score_df['Total Score'].quantile(0.80)
+        score_cutline = self.score_df['Total Score'].quantile(0.90)
         self.stratgy_df = self.score_df[self.score_df['Total Score'] >= score_cutline]
         self.stratgy_df = self.stratgy_df.sort_values(by= '6M momentum', ascending= False)
-        self.stratgy_df.head(30).to_csv(self.base_path + '/stratgy/VC2.csv')
+        self.stratgy_df.head(25).to_csv(self.base_path + '/stratgy/VC2.csv')
 
     
     def quant_TGS(self):
