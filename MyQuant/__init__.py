@@ -4,9 +4,9 @@ import os
 import pandas as pd
 
 class Quant(DataManager):
-    def __init__(self, rebalancing_date, bsns_year, base_path = "./data") -> None:
+    def __init__(self, rebalancing_date, bsns_year: str, base_path = "./data") -> None:
         super().__init__(base_path, bsns_year)
-        self.value_list_low_good = ['PBR', 'PER', 'PSR', 'EE', 'PCR',]
+        self.value_list_low_good = ['PBR', 'PER', 'PSR', 'EE', 'PCR','revPER']
         self.value_list_high_good = ['DIV',]
         self.score_df = None
         self.stratgy_df = None
@@ -101,8 +101,9 @@ class Quant(DataManager):
         for v in rlist:
             temp_dic[v] = stock.valuestate[v]['value']
             temp_dic[v + ' score'] = stock.valuestate[v]['score']
-        for v in addlist:
-            temp_dic[v] = stock.financestate[v]
+        if addlist:
+            for v in addlist:
+                temp_dic[v] = stock.financestate[v]
         return temp_dic
 
     def _cal_total_score(self, rlist, adjust_val):
@@ -110,7 +111,6 @@ class Quant(DataManager):
         for i,v in enumerate(rlist):
             self.score_df['Total Score'] += self.score_df[v + ' score']*adjust_val[i]
         
-
     def set_score(self):
         self.set_low_scores()
         self.set_high_scores()
@@ -149,14 +149,18 @@ class Quant(DataManager):
             self.quant_TGS()
         elif st == 'Mine':
             self.quant_Mine()
-        elif st == "steady_PER":
+        elif st == "STPER":
             self.quant_STPER()
     
     def quant_STPER(self):
-        rlist =['steady_PER', 'EE']
-        adjust_val = [1, 1]
+        rlist =['revPER']
+        adjust_val = [1]
         self._ceck_required_value(rlist)
-        
+        addlist = None
+        self._stockdic_to_df(rlist, addlist, adjust_val)
+        self.stratgy_df = self.score_df
+        self.stratgy_df = self.stratgy_df.sort_values(by= 'Total Score', ascending= False)
+        self.stratgy_df.head(25).to_csv(self.base_path + '/stratgy/STPER.csv')
 
     def quant_Mine(self):
         rlist =['PBR', 'PER', 'PSR', 'EE', 'PCR','DIV'] # in valuestate

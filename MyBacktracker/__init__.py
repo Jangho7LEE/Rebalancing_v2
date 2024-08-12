@@ -204,7 +204,7 @@ class Backtracker(object):
     Data crolling과 Qaunt stratgy를 결정하게 된다.
     '''
     
-    def set_dart_qaunt_ready(self,bsns_year):
+    def set_dart_qaunt_ready(self, bsns_year: str):
         base_path = f"./data/data_{bsns_year}"
         if not os.path.exists(base_path): os.makedirs(base_path)
         self.newDart = DART(rebalancing_date= self.rebalancing_date,bsns_year = bsns_year, base_path = base_path)
@@ -251,6 +251,8 @@ class Backtracker(object):
             self.newQuant.mining_price()
             self.newQuant.curving_finance()
             self.newDart.saveFlag(flag= "MiningPrice", value=self.rebalancing_date)
+        # self.newQuant.curving_finance()
+        # self.newDart.saveFlag(flag= "MiningPrice", value=self.rebalancing_date)
 
     def qaunt(self):
         if not self.newQuant.loadFlag("Stratgy") == self.stratgy:

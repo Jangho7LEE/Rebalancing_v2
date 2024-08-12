@@ -98,6 +98,20 @@ def _set_values(stock,bsns_year):
     _set_values_DIV(stock, bsns_year)
     _set_values_EPS_G(stock, bsns_year)
     _set_values_ACCPS(stock, bsns_year)
+    _set_values_revPER(stock, bsns_year)
+
+def _set_values_revPER(stock, bsns_year):
+    '''
+    delPER = [주가(현재)/주가(작년)] / [EPS(현재)/EPS(작년)]   =  delta 시가총액 /delta 순이익 (ifrs-full_ProfitLoss)
+    '''
+    last_bsns_year = str(int(bsns_year)-1)
+    required_account_list = ['ifrs-full_ProfitLoss',
+                             ]
+    if _check_account(stock,required_account_list,bsns_year) and _check_account(stock,required_account_list,last_bsns_year):
+        DelEPS = stock.financestate['ifrs-full_ProfitLoss'][bsns_year]/ stock.financestate['ifrs-full_ProfitLoss'][last_bsns_year] +1
+        revPER  = (1 + float(stock.financestate['1Y momentum'])/100 ) / (DelEPS) 
+        stock.valuestate['revPER'] = {'value' : revPER}
+    else: stock.valuestate['status'] = 0
 
 def _get_market_cap(stock):
     '''
